@@ -6,17 +6,17 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tomial/goj-judger/internal/compile"
+	"github.com/tomial/goj-judger/internal/judger"
 	"github.com/tomial/goj-judger/internal/params"
 )
 
 var bp = params.NewBuild()
 
-// compileCmd represents the compile command
-var compileCmd = &cobra.Command{
-	Use:       "compile <language>",
-	Short:     "compile source code in docker",
-	Long:      "compile source code in docker",
+// judgeCmd represents the compile command
+var judgeCmd = &cobra.Command{
+	Use:       "judge <language>",
+	Short:     "judge source code in docker",
+	Long:      "judge source code in docker",
 	ValidArgs: []string{"go", "golang", "c", "c++", "cpp"},
 	Args:      cobra.OnlyValidArgs,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -26,8 +26,8 @@ var compileCmd = &cobra.Command{
 		} else {
 			lang := strings.ToLower(args[0])
 
-			if bp.SourcePath == "" {
-				bp.SourcePath = "./source" + params.SourceSuffix[lang]
+			if bp.WorkDir == "" {
+				bp.WorkDir = "/build"
 			}
 
 			switch lang {
@@ -36,10 +36,14 @@ var compileCmd = &cobra.Command{
 			case "golang":
 				fmt.Println("Compiling go code.")
 				fmt.Println("[Params]")
-				fmt.Printf("- Source Path: %10v\n", bp.SourcePath)
+				fmt.Printf("- Source Path: %10v\n", bp.WorkDir)
 				fmt.Printf("- Size Limit: %10vMB\n", bp.SizeLimit)
 				fmt.Printf("- Time Limit: %10v\n", bp.TimeLimit)
-				compile.Golang(bp)
+				judger := judger.NewGolang()
+				err := judger.Start()
+				if err != nil {
+					panic(err)
+				}
 			case "c":
 				fmt.Println("Compiling c code.")
 			case "c++":
@@ -52,16 +56,16 @@ var compileCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(compileCmd)
+	rootCmd.AddCommand(judgeCmd)
 
-	compileCmd.Flags().StringVarP(&bp.SourcePath, "source code path", "p", bp.SourcePath,
-		"specify <path>/<name>.<suffix> for source code.")
+	judgeCmd.Flags().StringVarP(&bp.WorkDir, "work directory for container", "p", bp.WorkDir,
+		"specify work directory for container")
 
-	compileCmd.Flags().IntVarP(&bp.SizeLimit, "binary file size limit", "s", bp.SizeLimit,
+	judgeCmd.Flags().IntVarP(&bp.SizeLimit, "binary file size limit", "s", bp.SizeLimit,
 		"specify size for compiled binary file in MB.")
 
 	var compileTime int64
-	compileCmd.Flags().Int64VarP(&compileTime, "compile time limit", "t", 5000,
+	judgeCmd.Flags().Int64VarP(&compileTime, "compile time limit", "t", 5000,
 		"specify compile time in ms.")
 
 	bp.TimeLimit = time.Duration(compileTime) * time.Millisecond
