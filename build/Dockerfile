@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM gcc:9.3.0
 MAINTAINER b1250284002@hotmail.com
 
-WORKDIR /compile/go
+WORKDIR /compile/c-cpp

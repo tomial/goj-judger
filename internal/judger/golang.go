@@ -2,7 +2,6 @@ package judger
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,20 +16,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-var ctx context.Context
-
-func init() {
-	ctx = context.Background()
-}
-
-type golang struct {
-	judger
-}
+type golang struct{}
 
 func (g *golang) Start() error {
 	err := g.prepare()
 	if err != nil {
-		return errors.Wrap(err, "Failed to prepare for judging go code.")
+		return errors.Wrap(err, "Failed to prepare for judging Go code.")
 	}
 
 	fmt.Println("running user's code now.")
@@ -128,14 +119,14 @@ func (g *golang) prepare() error {
 				Mounts: []mount.Mount{
 					{
 						Type:   mount.TypeBind,
-						Source: "/home/lsxph/volumetest",
+						Source: "/home/lsxph/volume/go",
 						Target: "/compile/go",
 					},
 				},
 			}, nil, nil, "goj-judger-go-container")
 
 		if err != nil {
-			return errors.Wrap(err, "Error occured when creating container.")
+			return errors.Wrap(err, "Error occurred when creating container.")
 		}
 
 		if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
@@ -194,11 +185,9 @@ func (g *golang) run() error {
 		outputDone <- err
 	}()
 
-	select {
-	case err := <-outputDone:
-		if err != nil {
-			return errors.Wrap(err, "Failed to read output from exec.")
-		}
+	err = <-outputDone
+	if err != nil {
+		return errors.Wrap(err, "Failed to read output from exec.")
 	}
 
 	res, err := ioutil.ReadAll(&outBuf)
