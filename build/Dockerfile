@@ -1,4 +1,8 @@
 FROM gcc:9.3.0
-MAINTAINER b1250284002@hotmail.com
+LABEL maintainer="b1250284002@hotmail.com"
 
-WORKDIR /compile/c-cpp
+WORKDIR /judge
+
+COPY ./xtime.sh /judge
+COPY ./run.sh /judge
+COPY ./time /judge

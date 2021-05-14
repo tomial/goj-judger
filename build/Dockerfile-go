@@ -1,4 +1,8 @@
 FROM golang:1.16
-MAINTAINER b1250284002@hotmail.com
+LABEL maintainer="b1250284002@hotmail.com"
 
-WORKDIR /compile/go
+WORKDIR /judge
+
+COPY ./xtime.sh /judge
+COPY ./run.sh /judge
+COPY ./time /judge

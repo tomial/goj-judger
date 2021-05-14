@@ -1,6 +1,0 @@
-FROM gcc:9.3.0
-LABEL maintainer="b1250284002@hotmail.com"
-
-WORKDIR /compile/c-cpp
-
-COPY ./xtime.sh /compile/c-cpp

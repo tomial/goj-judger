@@ -1,11 +1,10 @@
 package params
 
-import "time"
-
-type Build struct {
-	WorkDir   string // path of source code
-	TimeLimit time.Duration
-	SizeLimit int
+type JudgeRequest struct {
+	CaseNum   int
+	TimeLimit int
+	RamLimit  int
+	VolumeDir string
 }
 
 var SourceSuffix = map[string]string{
@@ -15,10 +14,9 @@ var SourceSuffix = map[string]string{
 	"c++": ".cpp",
 }
 
-func NewBuild() *Build {
-	return &Build{
-		WorkDir:   "",
-		TimeLimit: 5000 * time.Microsecond,
-		SizeLimit: 10,
+func NewJudgeRequest() *JudgeRequest {
+	return &JudgeRequest{
+		TimeLimit: 1000,
+		RamLimit:  10,
 	}
 }

@@ -1,19 +1,47 @@
 package judger
 
-type cpp struct{}
+import (
+	"fmt"
+	"os"
+	"strconv"
 
-func (cpp *cpp) Start() error {
-	return nil
-}
+	"github.com/tomial/goj-judger/internal/params"
+)
 
-func (cpp *cpp) prepare() error {
-	return nil
-}
+func JudgeCPP(jr *params.JudgeRequest) {
+	caseNum = jr.CaseNum
+	tlimit = jr.TimeLimit
+	rlimit = jr.RamLimit
+	volumeDir = jr.VolumeDir
+	containerName = "c-cpp-judger-container"
 
-func (cpp *cpp) compile() error {
-	return nil
-}
+	imageName = "miata/goj-judger-c-cpp-img"
+	buildCmd = "g++ -o main source.cpp 2> build_result; exit $?"
+	runCmd = "./xtime.sh " + strconv.Itoa(caseNum) + " " + strconv.Itoa(tlimit)
 
-func (cpp *cpp) run() error {
-	return nil
+	// 准备C++判题镜像
+	err := prepareImg()
+
+	if err != nil {
+		fmt.Println(err, "准备阶段发生错误")
+		os.Exit(UNKNOWN_ERROR)
+	}
+
+	// 编译C++代码
+	err = compile()
+	if err != nil {
+		fmt.Println(err, "编译错误")
+		os.Exit(COMPILE_ERROR)
+	}
+
+	fmt.Println("正在运行用户C++代码")
+	err = run()
+	if err != nil {
+		fmt.Println(err, "运行用户C++代码失败")
+		os.Exit(UNKNOWN_ERROR)
+	}
+
+	result := compare(volumeDir, caseNum)
+
+	os.Exit(result)
 }
