@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-units"
 	"github.com/pkg/errors"
 )
 
@@ -117,6 +118,8 @@ func prepareImg() error {
 	// Create the container if not exist
 	if !conCreated {
 		fmt.Println("正在创建新容器...")
+		PIDLimit := new(int64)
+		*PIDLimit = 100
 		resp, err := cli.ContainerCreate(
 			ctx,
 			&container.Config{
@@ -131,6 +134,16 @@ func prepareImg() error {
 						Source: volumeDir,
 						Target: "/judge",
 					},
+				},
+				AutoRemove:  true,   // 容器退出后自动删除
+				NetworkMode: "none", // 禁止网络
+				Resources: container.Resources{
+					Ulimits: []*units.Ulimit{&units.Ulimit{
+						Name: "fsize",
+						Hard: 32768, // 限制最大生成文件大小为32768 * 4kB = 128MB
+					}},
+					Memory:    102400,   // 限制容器内存使用为100MB
+					PidsLimit: PIDLimit, // 限制进程个数
 				},
 			}, nil, nil, containerName)
 

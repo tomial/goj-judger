@@ -16,7 +16,7 @@ func JudgeCPP(jr *params.JudgeRequest) {
 	containerName = "c-cpp-judger-container"
 
 	imageName = "miata/goj-judger-c-cpp-img"
-	buildCmd = "g++ -o main source.cpp 2> build_result; exit $?"
+	buildCmd = "g++ -o main source.cpp -Wfatal-errors 2> build_result; exit $?"
 	runCmd = "./xtime.sh " + strconv.Itoa(caseNum) + " " + strconv.Itoa(tlimit)
 
 	// 准备C++判题镜像
