@@ -34,7 +34,9 @@ func compare(volumeDir string, caseNum int) ResultCode {
 		cmd := exec.Command("diff", "-uZ", volumeDir+"output-"+caseNo, volumeDir+"res-"+caseNo)
 		err := cmd.Run()
 		if err != nil || cmd.ProcessState.ExitCode() > 0 {
-			fmt.Println("答案错误")
+			fmt.Println(err)
+			fmt.Println(cmd.ProcessState.ExitCode())
+			fmt.Println("答案错误：", caseNo)
 			exec.Command("cp", volumeDir+"input-"+caseNo, volumeDir+"wa_input").Run()
 			exec.Command("cp", volumeDir+"output-"+caseNo, volumeDir+"wa_output").Run()
 			exec.Command("cp", volumeDir+"res-"+caseNo, volumeDir+"wa_expect").Run()

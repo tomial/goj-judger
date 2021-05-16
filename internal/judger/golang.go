@@ -13,9 +13,9 @@ func JudgeGo(jr *params.JudgeRequest) {
 	tlimit = jr.TimeLimit
 	rlimit = jr.RamLimit
 	volumeDir = jr.VolumeDir
+	imageName = "miata/goj-judger-go-img"
 	containerName = "go-judger-container"
 
-	imageName = "miata/goj-judger-go-img"
 	buildCmd = "go build -o main source.go 2> build_result; exit $?"
 	runCmd = "./xtime.sh " + strconv.Itoa(caseNum) + " " + strconv.Itoa(tlimit)
 
